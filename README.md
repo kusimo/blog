@@ -9,7 +9,7 @@
 
 ## Laravel Requirement
 
-See all the requirements, for example, you need to have PHP that is equal to or greater than 7.25. [See more on installation by visiting Laravel site](https://laravel.com/docs/7.x/installation).
+See all the requirements, for example, you need to have PHP version that is equal to or greater than 7.25. [See more on installation by visiting Laravel site](https://laravel.com/docs/7.x/installation).
 
 I'm using Mac, the process will be different on Windows. Please visit [Laravel Installation Guide](https://laravel.com/docs/8.x/installation#installation-via-composer)
 
@@ -56,6 +56,31 @@ cd project-name
 ```
 php artisan serve
 ```
+
+## Getting to know Laravel
+
+Open up the foler that contains your Laravel project, you will see that there are lots of folder there. When you run the <code>php artisan serve</code>, the folder that holds the html can be found under resources/views.
+
+Inside the views folder you will find a file 'welcome.blade.php', this is called blade template. This is the file that generate our view, the one we see on the homepage. Every blade template will have 'blade.php' extension. 
+
+If you open this up, you will see that it just look like normal HTML file. You can change a piece of text and reload the page to view your changes. 
+
+We will come back to view, but let's start with Routing.
+
+### Routing
+Expand the 'routes' folder, we are going to be working in the web.php for the most part. You will see that there is an api.php file as well this is used when creating an API project.
+
+In the web.php file, we are going to be loading all our views and controllers. The route is what handles all the requests and return the views - accepts a request and redirect it to a function. 
+
+```
+Route::get('/', function () {
+    return view('welcome');
+});
+```
+
+The example above shows that the route accepts a get request with path of root ('/') and returns a welcome page view. Another way of saying this is if the page is home, return a page that is called welcome (welcome.blade.php). This is how we load a view.
+> Note the welcome in the name of the file and the welcome in the view function parameter, this needs to match. No need to put '.blade.php'. 
+
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
