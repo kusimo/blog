@@ -7,7 +7,55 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Laravel Requirement
+
+See all the requirements, for example, you need to have PHP that is equal to or greater than 7.25. [See more on installation by visiting Laravel site](https://laravel.com/docs/7.x/installation).
+
+I'm using Mac, the process will be different on Windows. Please visit [Laravel Installation Guide](https://laravel.com/docs/8.x/installation#installation-via-composer)
+
+Once your system meets all the requirement, install [Composer](https://getcomposer.org/) as Laravel use this to manage its dependencies. 
+ 
+
+Download the Laravel installer using Composer:
+
+```
+composer global require laravel/installer
+```
+
+Edit the bash profile by placing composer system-wide vendor bin directory in your $PATH so laravel executable can be located by the system. You can do this by placing this code in your bash_profile.
+
+```
+nano ~/.bash_profile
+```
+
+Add the code below to the file that is opened
+
+```
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+```
+
+Update the the current terminal to detect the changes or open another terminal
+
+```
+source ~/.bash_profile
+```
+
+
+## Create a new project
+Run the below command to create new project. project-name is the name in the command is the name of your project name or folder that Laravel will be installed.
+
+```
+laravel new the-project-name
+```
+Navigate to the the project you just created
+```
+cd project-name
+```
+
+## Run the project
+```
+php artisan serve
+```
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
