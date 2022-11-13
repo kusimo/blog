@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-# Understand the Basics
+# Understand Laravel routing with examples 
 This section will focus on some basics.
 
 ## Laravel Requirement
@@ -223,7 +223,7 @@ Navigate to http://127.0.0.1:8000/api/products, because this is an api request, 
 
 This are some of the features in Laravel that makes web development easy.
 
-> Visit [routing page on Laravel](https://laravel.com/docs/9.x/routing) to learn more about parameters you can pass.
+> Visit [routing page on Laravel](https://laravel.com/docs/9.x/routing) to learn more about Laravel routing.
 
 
 
