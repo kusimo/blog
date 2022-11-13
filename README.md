@@ -7,6 +7,9 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+# Understand the Basics
+This section will focus on some basics.
+
 ## Laravel Requirement
 
 See all the requirements, for example, you need to have PHP version that is equal to or greater than 7.25. [See more on installation by visiting Laravel site](https://laravel.com/docs/7.x/installation).
@@ -80,60 +83,149 @@ Route::get('/', function () {
 
 The example above shows that the route accepts a get request with path of root ('/') and returns a welcome page view. Another way of saying this is if the page is home, return a page that is called welcome (welcome.blade.php). This is how we load a view.
 > Note the welcome in the name of the file and the welcome in the view function parameter, this needs to match. No need to put '.blade.php'. 
+Route will return whatever you put after the return statement, let's add another route to the current one and return a piece of html.
+
+```
+Route::get('/about', function () {
+    return '<h2>About me</h2>';
+});
+```
+If you navigate to http://127.0.0.1:8000/about, you will see the content we just added. Routes accept request and redirect it to appropriate function.
+
+Routes comes with many default parameter however you can pass optional parameters to route. For instance, let's render our content as a plain text with the following code:
+```
+Route::get('/about', function () {
+    return response('<h2>About me</h2>')
+    ->header('Content-Type', 'text/plain');
+});
+```
+
+Let's say we want to add custom values to the header, we can do it like so:
+```
+Route::get('/about', function () {
+    return response('<h2>About me</h2>')
+    ->header('Content-Type', 'text/plain')
+    ->header('day', 'Friday');
+});
+```
+Save the changes and reload the page. If we open the inspector tab and navigate to the network tab, click on the page name on the left 'about', then click the 'Header' tab. The new value should now be added under the 'Response Headers' section.
+
+### Wildcard
+Most of the time you want to append a parameter to a route, for example you want to add an ID to a URL, let's create another route to demostrate this. 
+
+```
+Route::get('/post/{id}', function($id) {
+    return response('Post ID: '. $id);
+});
+```
+The {id} is curly braces is the wildcard in the above code. We pass the variable with the same name to our function. We then use the variable inside our return statement.
+If we navigate to 'http://127.0.0.1:8000/post/1', the content and the value that we pass to the wildcard will should be displayed on the page. 
+
+You will notice that we can enter a string like so 'http://127.0.0.1:8000/post/hello' and our page will still work. We expect an ID not string. Let's add an exception/constrain.
+Route::get('/post/{id}', function($id) {
+    return response('Post ID: '. $id);
+})->where('id', '[0-9]+');
+
+We added a constrain for the value to be numbers not letters. If we reload the page and pass letters instead of numbers to the ID, we will get a 404 not found as the value does not match the contrains. 
+
+#### Debugging
+The dd() - is a Laravel helper function for showing variables for the purpose of debugging, it stands for 'Dump and Die'. Let's use dd() helper in our code to see how it works.
+```
+Route::get('/post/{id}', function($id) {
+    dd($id);
+    return response('Post ID: '. $id);
+})->where('id', '[0-9]+');
+```
+If we navigate to our browser and reload the page, we should see something like so:
+> http://127.0.0.1:8000/post/8
+```
+"8" // routes/web.php:27
+```
+Another helper function for debugging is ddd() means 'Dump, Die, Debug'. This will give us more information like the name of the file, the breakpoint where we called the helper, the code, session value and more. Try the below code and reload the browser.
+```
+Route::get('/post/{id}', function($id) {
+    ddd($id);
+    return response('Post ID: '. $id);
+})->where('id', '[0-9]+');
+```
+The dd() and ddd() helpers are useful for debugging.
+
+#### Request
+Sometimes we may have a query string in the URL that we want to get the values from. We can pass this object to the routes and get the object value in the view through the request, this is called Route-Model binding. We need to use the Request framework for this. To use a framework, we need to import it. Let's import the Request and create another route for this purpose.
+
+```
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/about', function () {
+    return response('<h2>About me</h2>')
+    ->header('Content-Type', 'text/plain')
+    ->header('country', 'UK');
+});
+
+Route::get('/post/{id}', function($id) {
+    ddd($id);
+    return response('Post ID: '. $id);
+})->where('id', '[0-9]+');
+
+Route::get('/search', function(Request $request) {
+    dd($request);
+});
+```
+
+In the code above, we brought in the Request framework and we created a route that use the framework. Note that we added 'Request' before our parameter, this is the syntax to follow when using Request. The dd() is used again to give us some insight about our code - what is inside the request object.
+
+Let's navigate to this URL - http://127.0.0.1:8000/search?gender=m&city=london 
+
+![](./screenshots/laravel-request-example.png)
+You will see that there are loads of information inside the request object but we are interested in the query for now. Our parameters and values can be found under 'query'. 
+
+We can also add the parameters directly inside the router like so:
+```
+Route::get('/search', function(Request $request) {
+    return ($request->gender . ' ' . $request->city);
+});
+```
+
+If we reload our browser again, we should see the values displayed.
+
+Before we move on, let's take a look at the API example of routing. Open the 'routes/api.php', and add the code below:
+
+```
+Route::get('/products', function() {
+    return response()->json([
+        'products' => [
+            [
+                'name'  => 'Carnival T-Shirt',
+                'color' => 'white',
+                'price' => '19.99',
+                'size'  => 'large'
+            ],
+            [
+                'name'  => 'Elegant T-Shirt',
+                'color' => 'blue',
+                'price' => '19.99',
+                'size'  => 'large'
+            ]
+        ]
+    ]);
+});
+```
+Navigate to http://127.0.0.1:8000/api/products, because this is an api request, we need top add api root to the URL. Our browser should display some JSON data.
+
+![](./screenshots/laravel-api-example.png)
+
+This are some of the features in Laravel that makes web development easy.
+
+> Visit [routing page on Laravel](https://laravel.com/docs/9.x/routing) to learn more about parameters you can pass.
 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
