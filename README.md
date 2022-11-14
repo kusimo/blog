@@ -81,7 +81,7 @@ Route::get('/', function () {
 });
 ```
 
-The example above shows that the route accepts a get request with path of root ('/') and returns a welcome page view. Another way of saying this is if the page is home, return a page that is called welcome (welcome.blade.php). This is how we load a view.
+The example above shows that the route accepts a get request with path of root directory ('/') and returns a welcome page view(callback). Another way of saying this is if the page is home (start page), return a page that is called welcome (welcome.blade.php). This is how we load a view.
 > Note the welcome in the name of the file and the welcome in the view function parameter, this needs to match. No need to put '.blade.php'. 
 Route will return whatever you put after the return statement, let's add another route to the current one and return a piece of html.
 
@@ -90,6 +90,8 @@ Route::get('/about', function () {
     return '<h2>About me</h2>';
 });
 ```
+> We are going to be using the ::get route method. Other router methods that are available are ::post, ::put, ::patch, ::delete, ::options, ::views, ::redirect and more.
+
 If you navigate to http://127.0.0.1:8000/about, you will see the content we just added. Routes accept request and redirect it to appropriate function.
 
 Routes comes with many default parameter however you can pass optional parameters to route. For instance, let's render our content as a plain text with the following code:
@@ -110,23 +112,49 @@ Route::get('/about', function () {
 ```
 Save the changes and reload the page. If we open the inspector tab and navigate to the network tab, click on the page name on the left 'about', then click the 'Header' tab. The new value should now be added under the 'Response Headers' section.
 
-### Wildcard
-Most of the time you want to append a parameter to a route, for example you want to add an ID to a URL, let's create another route to demostrate this. 
+### Wildcard (Parameters)
+Sometimes we may need to append a parameter to a route, for example you want to add an ID to a URI and capture the ID, let's create another route example to demostrate this. 
 
 ```
 Route::get('/post/{id}', function($id) {
     return response('Post ID: '. $id);
 });
 ```
-The {id} is curly braces is the wildcard in the above code. We pass the variable with the same name to our function. We then use the variable inside our return statement.
-If we navigate to 'http://127.0.0.1:8000/post/1', the content and the value that we pass to the wildcard will should be displayed on the page. 
+> Route parameters are always encased within {} 
 
-You will notice that we can enter a string like so 'http://127.0.0.1:8000/post/hello' and our page will still work. We expect an ID not string. Let's add an exception/constrain.
+In the above example, we captured the post ID using a wildcard (wildcard is the curly braces). We define a route parameter ($id), then use this inside our return statement. Another way of saying this is, whatever we put as the 'id' becomes a URI and we can get the value inside our views. 
+
+If we navigate to 'http://127.0.0.1:8000/post/1', the content and the value that we pass to the wildcard should be displayed on the page. 
+
+### Regular Expression Constraints
+You will notice that we can enter a string like so 'http://127.0.0.1:8000/post/hello' and our page will still work. We expect number as value not string. Let's add an expression constraints.
+
+```
 Route::get('/post/{id}', function($id) {
     return response('Post ID: '. $id);
 })->where('id', '[0-9]+');
+```
+> You may constrain the format of your route parameters using the where method
 
-We added a constrain for the value to be numbers not letters. If we reload the page and pass letters instead of numbers to the ID, we will get a 404 not found as the value does not match the contrains. 
+We added constraint for the value to be numbers not letters using where method on a route instance, The where method accepts the name of the parameter and a regular expression defining how the parameter should be constrained. 
+
+If we reload the page and pass letters instead of numbers to the ID, we will get a 404 not found as the value does not match the contraints. 
+
+Laravel have helpers for most commonly used regular expressions patterns. For example, we can add contrain like so:
+```
+Route::get('/post/{id}', function($id) {
+    return response('Post ID: '. $id);
+})->whereNumber('id');
+```
+
+You may define as many route parameters as required by your route like so:
+
+```
+Route::get('/category/{category}/post/{post}', function($categoryId, $postId) {
+    //
+});
+```
+>
 
 #### Debugging
 The dd() - is a Laravel helper function for showing variables for the purpose of debugging, it stands for 'Dump and Die'. Let's use dd() helper in our code to see how it works.
@@ -151,7 +179,7 @@ Route::get('/post/{id}', function($id) {
 The dd() and ddd() helpers are useful for debugging.
 
 #### Request
-Sometimes we may have a query string in the URL that we want to get the values from. We can pass this object to the routes and get the object value in the view through the request, this is called Route-Model binding. We need to use the Request framework for this. To use a framework, we need to import it. Let's import the Request and create another route for this purpose.
+Sometimes we may have a query string in the URI that we want to get the values from. We can pass this object to the routes and get the object value in the view through the request, this is called Route-Model binding. We need to use the Request framework for this. To use a framework, we need to import it. Let's import the Request and create another route for this purpose.
 
 ```
 <?php
@@ -179,14 +207,14 @@ Route::get('/search', function(Request $request) {
 });
 ```
 
-In the code above, we brought in the Request framework and we created a route that use the framework. Note that we added 'Request' before our parameter, this is the syntax to follow when using Request. The dd() is used again to give us some insight about our code - what is inside the request object.
+In the code above, we brought in the Request class and we created a route to use the class. Note that we added 'Request' before our parameter, this is the syntax to follow when using Request. The dd() is used again to give us some insight about our code - what is inside the request object.
 
 Let's navigate to this URL - http://127.0.0.1:8000/search?gender=m&city=london 
 
 ![](./screenshots/laravel-request-example.png)
-You will see that there are loads of information inside the request object but we are interested in the query for now. Our parameters and values can be found under 'query'. 
+You will see that there are loads of information inside the request object but we are interested in the query object for now. Our parameters and values can be found under 'query'. 
 
-We can also add the parameters directly inside the router like so:
+We can also add the parameters directly inside the callback function like so:
 ```
 Route::get('/search', function(Request $request) {
     return ($request->gender . ' ' . $request->city);
@@ -217,7 +245,7 @@ Route::get('/products', function() {
     ]);
 });
 ```
-Navigate to http://127.0.0.1:8000/api/products, because this is an api request, we need top add api root to the URL. Our browser should display some JSON data.
+Navigate to http://127.0.0.1:8000/api/products, because this is a route defined in the routes/api, the /api URI prefix is automatically applied. Our browser should display some JSON data.
 
 ![](./screenshots/laravel-api-example.png)
 
